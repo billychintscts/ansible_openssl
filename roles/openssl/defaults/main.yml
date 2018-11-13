@@ -1,0 +1,34 @@
+---
+
+###
+# OPENSSL
+###
+
+# Directory
+openssl_dir_certs:
+  path: /etc/ssl/certs
+  owner: root
+  group: root
+  mode: "0755"
+openssl_dir_keys:
+  path: /etc/ssl/private
+  owner: root
+  group: root
+  mode: "0700"
+openssl_dir_csrs:
+  path: /etc/ssl/csr
+  owner: root
+  group: root
+  mode: "0755"
+
+# Certificates
+openssl_certs:
+  - country_name: CA
+    state_or_province_name: Quebec
+    locality_name: Montreal
+    organization_name: Ansible
+    organizational_unit_name: Wikitops Org
+    common_name: wikitops
+    email_address: wikitops@wikitops.io
+    provider: selfsigned
+    state: present

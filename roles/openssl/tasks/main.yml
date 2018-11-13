@@ -1,0 +1,57 @@
+---
+
+- name: OPENSSL | Installation
+  package:
+    name:
+      - openssl
+    state: present
+
+- name: OPENSSL | Manage directories
+  file:
+    state: directory
+    path: "{{ item.path }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "{{ item.mode }}"
+  with_items:
+    - "{{ openssl_dir_certs }}"
+    - "{{ openssl_dir_keys }}"
+    - "{{ openssl_dir_csrs }}"
+
+- name: OPENSSL | Configuration
+  template:
+    src: etc/ssl/openssl.cnf.j2
+    dest: /etc/ssl/openssl.cnf
+    owner: root
+    group: root
+    mode: 0644
+
+- name: OPENSSL | Generate the new private keys
+  openssl_privatekey:
+    path: "{{ openssl_dir_certs.path }}/{{ item.common_name }}.key"
+    size: 4096
+    state: present
+    type: RSA
+  with_items: "{{ openssl_certs }}"
+
+- name: OPENSSL | Generate the new CSR
+  openssl_csr:
+    path: "{{ openssl_dir_csrs.path }}/{{ item.common_name }}.csr"
+    privatekey_path: "{{ openssl_dir_certs.path }}/{{ item.common_name }}.key"
+    country_name: "{{ item.country_name | default(omit) }}"
+    state_or_province_name: "{{ item.state_or_province_name | default(omit) }}"
+    locality_name: "{{ item.locality_name | default(omit) }}"
+    organization_name: "{{ item.organization_name | default(omit) }}"
+    organizational_unit_name: "{{ item.organizational_unit_name | default(omit) }}"
+    common_name: "{{ item.common_name }}"
+    email_address: "{{ item.email_address | default(omit) }}"
+    state: "{{ item.state }}"
+  with_items: "{{ openssl_certs }}"
+
+- name: OPENSSL | Generate the Self Signed certificates
+  openssl_certificate:
+    path: "{{ openssl_dir_csrs.path }}/{{ item.common_name }}.pem"
+    privatekey_path: "{{ openssl_dir_certs.path }}/{{ item.common_name }}.key"
+    csr_path: "{{ openssl_dir_csrs.path }}/{{ item.common_name }}.csr"
+    provider: "{{ item.provider }}"
+  with_items: "{{ openssl_certs }}"
