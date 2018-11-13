@@ -4,31 +4,77 @@
 # OPENSSL
 ###
 
-# Directory
+# Certificates to create
+openssl_certs:
+
+  - common_name: wikitops                       # Required
+    passphrase: OpenSSLP4ssPhr4s33x3mp13        # Optional: Only to secure the certificate with a password
+    provider: selfsigned                        # Required: selfsigned, ownca
+    valid_in: 7776000                           # Required: 90 jours in seconds by default
+    state: present                              # Required
+
+    # Only to provide external certificate authority
+    ownca_path: ""                              # Optional
+    ownca_privatekey_path: ""                   # Optional
+
+    # Only to configure the certificate
+    country_name: CA                            # Optional
+    state_or_province_name: Quebec              # Optional
+    locality_name: Montreal                     # Optional
+    organization_name: Ansible                  # Optional
+    organizational_unit_name: Wikitops Org      # Optional
+    email_address: wikitops@wikitops.io         # Optional
+
+# Directories
 openssl_dir_certs:
-  path: /etc/ssl/certs
+  path: "{{ openssl_dir }}/certs"
   owner: root
   group: root
   mode: "0755"
 openssl_dir_keys:
-  path: /etc/ssl/private
+  path: "{{ openssl_dir }}/private"
   owner: root
   group: root
   mode: "0700"
 openssl_dir_csrs:
-  path: /etc/ssl/csr
+  path: "{{ openssl_dir }}/csr"
+  owner: root
+  group: root
+  mode: "0755"
+openssl_dir_crl:
+  path: "{{ openssl_dir }}/crl"
   owner: root
   group: root
   mode: "0755"
 
-# Certificates
-openssl_certs:
-  - country_name: CA
-    state_or_province_name: Quebec
-    locality_name: Montreal
-    organization_name: Ansible
-    organizational_unit_name: Wikitops Org
-    common_name: wikitops
-    email_address: wikitops@wikitops.io
-    provider: selfsigned
-    state: present
+# Default Configuration
+
+# [ CA_default ]
+openssl_dir: /etc/ssl
+openssl_default_days: 365
+openssl_default_crl_days: 30
+
+# [ req ]
+openssl_default_bits: 4096
+openssl_default_keyfile: privkey.pem
+openssl_distinguished_name: req_distinguished_name
+openssl_attributes: req_attributes
+openssl_x509_extensions: v3_ca
+
+# [ req_distinguished_name ]
+openssl_countryName: Country Name (2 letter code)
+openssl_countryName_default: AU
+openssl_countryName_min: 2
+openssl_countryName_max: 2
+openssl_stateOrProvinceName: State or Province Name (full name)
+openssl_stateOrProvinceName_default: Some-State
+openssl_localityName: Locality Name (eg, city)
+openssl_organizationalUnitName: Organizational Unit Name (eg, section)
+openssl_commonName: Common Name (e.g. server FQDN or YOUR name)
+openssl_commonName_max: 64
+openssl_emailAddress: Email Address
+openssl_emailAddress_max: 64
+
+# [ req_attributes ]
+openssl_challengePassword_min: 4
+openssl_challengePassword_max: 20

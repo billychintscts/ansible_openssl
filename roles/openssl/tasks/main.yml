@@ -17,6 +17,7 @@
     - "{{ openssl_dir_certs }}"
     - "{{ openssl_dir_keys }}"
     - "{{ openssl_dir_csrs }}"
+    - "{{ openssl_dir_crl }}"
 
 - name: OPENSSL | Configuration
   template:
